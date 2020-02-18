@@ -1,15 +1,47 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using belong.Models;
+using Microsoft.EntityFrameworkCore;
 
-// TODO: Move to its own class and namespace (belong.Repositories)
+// TODO: Move to its own file and namespace.
+public class BelongDbContext : DbContext {
+    public BelongDbContext(DbContextOptions<BelongDbContext> options) 
+        : base(options) {
+    }
+
+    // Find a way to make this plural as it has to match the db table.
+    public DbSet<Host> Host { get; set; }
+}
+
+// TODO: Move to its own file and namespace (belong.Repositories)
 public interface IHostRepository
 {
     Host GetHost (int id);
     IEnumerable<Host> GetHosts();
 }
 
-// TODO: Move to its own class and namespace (belong.Repositories)
+// TODO: Move to its own file and namespace (belong.Repositories)
+public class HostSqlRepository : IHostRepository
+{
+    public HostSqlRepository(BelongDbContext context) {
+        _context = context;
+    }
+
+    public Host GetHost(int id) {
+        var host = _context.Host.Find(id); // Connect to sql server and retrieve host by ID
+        return host;
+    }
+
+    public IEnumerable<Host> GetHosts() {
+        var hosts = _context.Host.Take(5);
+        return hosts.ToList();
+    }
+
+    private readonly BelongDbContext _context;
+}
+
+// TODO: Move to its own file and namespace (belong.Repositories)
 public class HostInMemoryRepository : IHostRepository
 {
     public Host GetHost(int id)
@@ -35,20 +67,6 @@ public class HostInMemoryRepository : IHostRepository
                 CreatedOn = DateTime.Now.AddDays(-10)
             }
         };
-    }
-}
-
-public class HostRepository : IHostRepository
-{
-    public Host GetHost(int id)
-    {
-        // connect to sql server and retrieve host by ID
-        throw new NotImplementedException();
-    }
-
-    public IEnumerable<Host> GetHosts()
-    {
-        throw new NotImplementedException();
     }
 }
 
