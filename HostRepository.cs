@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using belong.Models;
+using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 // TODO: Move to its own file and namespace.
 public class BelongDbContext : DbContext {
@@ -19,6 +22,32 @@ public interface IHostRepository
 {
     Host GetHost (int id);
     IEnumerable<Host> GetHosts();
+}
+
+// TODO: Move to its own file and namespace (belong.Repositories)
+public class HostDapperRepository : IHostRepository
+{
+    public HostDapperRepository(IConfiguration configuration) {
+        _configuration = configuration;
+    }
+
+    public Host GetHost(int id) {
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("BelongDb"))) {
+            connection.Open();
+            var host = connection.QueryFirstOrDefault<Host>(@"SELECT ID, Name + ' Dapper' as Name, CreatedOn FROM Host WHERE ID = @id", new {id = id});
+            return host;
+        }
+    }
+
+    public IEnumerable<Host> GetHosts() {
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("BelongDb"))) {
+            connection.Open();
+            var hosts = connection.Query<Host>(@"SELECT TOP 5 ID, Name + ' Dapper' as Name, CreatedOn FROM Host (NOLOCK)");
+            return hosts;
+        }
+    }
+
+    IConfiguration _configuration;
 }
 
 // TODO: Move to its own file and namespace (belong.Repositories)

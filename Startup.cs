@@ -28,7 +28,8 @@ namespace belong
         {
             // services.Add(new ServiceDescriptor(typeof(IHostRepository), new HostInMemoryRepository()));
             services.AddDbContext<BelongDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("BelongDb")));
-            services.AddScoped<IHostRepository, HostSqlRepository>();
+            // services.AddScoped<IHostRepository, HostSqlRepository>();
+            services.AddScoped<IHostRepository, HostDapperRepository>();
             services.AddControllers();
         }
 
