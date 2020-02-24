@@ -105,6 +105,20 @@ namespace belong.Models
     public class Host {
         public int ID { get; set; }
         public string Name { get; set; }
+        public string HousesUri {
+            get {
+                return string.Format("{0}/hosts/{1}/houses", UrlBase.Get(), ID);
+            }
+        }
         public DateTime CreatedOn { get; set; }
+    }
+
+    public class House {
+        public int Id { get; set; }
+        public int HostId { get; set; }
+        public string Address { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string ZipCode { get; set; }
     }
 }

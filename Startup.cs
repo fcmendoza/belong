@@ -34,12 +34,22 @@ namespace belong
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
+            _logger = logger;
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                _logger.LogInformation("This is dev.");
             }
+
+            app.Use(async (context, next) => {
+                var baseUrl = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.PathBase}";
+                _logger.LogInformation("Base URL: {baseUrl}", baseUrl);
+                UrlBase.Set(baseUrl);
+                await next();
+            });
 
             app.UseHttpsRedirection();
 
@@ -51,6 +61,19 @@ namespace belong
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private ILogger<Startup> _logger;
+    }
+
+    public static class UrlBase {
+        static string _baseUrl;
+
+        public static void Set(string baseUrl) {
+            _baseUrl = baseUrl;
+        }
+        public static string Get() {
+            return _baseUrl;
         }
     }
 }
