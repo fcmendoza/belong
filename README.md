@@ -1,3 +1,9 @@
+# Belong
+
+Belong is a web application that manages hosts and guests. It allows you to create, read, update, and delete hosts and guests, as well as manage the houses that hosts own.
+
+The project uses ASP.NET Core and a SQL Server database.
+
 ## Run application
 
 Go the project's directory and `dotnet run` from it:
