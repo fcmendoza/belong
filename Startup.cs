@@ -26,10 +26,18 @@ namespace belong
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // services.Add(new ServiceDescriptor(typeof(IHostRepository), new HostInMemoryRepository()));
-            services.AddDbContext<BelongDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("BelongDb")));
-            // services.AddScoped<IHostRepository, HostSqlRepository>();
-            services.AddScoped<IHostRepository, HostDapperRepository>();
+            var useMockData = Configuration.GetValue<bool>("UseMockData");
+
+            if (useMockData)
+            {
+                services.AddScoped<IHostRepository, HostInMemoryRepository>();
+            }
+            else
+            {
+                services.AddDbContext<BelongDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("BelongDb")));
+                services.AddScoped<IHostRepository, HostDapperRepository>();
+            }
+
             services.AddControllers();
         }
 
